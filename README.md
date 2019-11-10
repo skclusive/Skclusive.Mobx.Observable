@@ -37,9 +37,9 @@ defining the state of the application as a tree of observables, you can expose a
 A simple reactive-counter is represented by the following observable:
 
 ```c#
-import 'package:mobx/mobx.dart';
+using Skclusive.Mobx.Observable;
 
-final counter = Observable(0);
+var counter = ObservableValue<int>.From(0);
 ```
 
 More complex observables, such as classes, can be created as well.
