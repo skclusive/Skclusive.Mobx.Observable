@@ -6,5 +6,7 @@
     <AssemblyName>Skclusive.Mobx.Observable</AssemblyName>
     <PackageId>Skclusive.Mobx.Observable</PackageId>
     <RootNamespace>Skclusive.Mobx.Observable</RootNamespace>
+    <Authors>Skclusive</Authors>
+    <Company>Skclusive</Company>
   </PropertyGroup>
 </Project>

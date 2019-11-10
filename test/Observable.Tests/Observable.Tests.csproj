@@ -5,6 +5,8 @@
     <IsPackable>false</IsPackable>
     <AssemblyName>Skclusive.Mobx.Observable.Tests</AssemblyName>
     <RootNamespace>Skclusive.Mobx.Observable.Tests</RootNamespace>
+    <Authors>Skclusive</Authors>
+    <Company>Skclusive</Company>
   </PropertyGroup>
 
   <ItemGroup>
