@@ -43,7 +43,7 @@ namespace Skclusive.Mobx.Observable
 
             Values = values ?? new Dictionary<string, IObservable>();
 
-            Name = name ?? $"ObservableObject@{Globals.NextId}";
+            Name = name ?? $"ObservableObject@{States.NextId}";
 
             Manipulator = manipulator ?? Manipulator<W, object>.For();
 
@@ -318,7 +318,7 @@ namespace Skclusive.Mobx.Observable
                 }
             }
 
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 var oobservable = Values[key];
                 var value = (oobservable as IValueReader).Value;

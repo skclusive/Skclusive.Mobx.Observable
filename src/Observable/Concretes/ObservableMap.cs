@@ -27,7 +27,7 @@ namespace Skclusive.Mobx.Observable
 
             HasMap = new Map<TKey, IObservableValue<bool>>();
 
-            Name = name ?? $"ObservableMap@{Globals.NextId}";
+            Name = name ?? $"ObservableMap@{States.NextId}";
 
             Manipulator = manipulator ?? Manipulator<TIn, TOut, TKey>.For();
 
@@ -112,7 +112,7 @@ namespace Skclusive.Mobx.Observable
 
             TIn changed = default(TIn);
 
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 var observable = new ObservableValue<TIn>(value, $"${Name}.{key}");
 
@@ -208,7 +208,7 @@ namespace Skclusive.Mobx.Observable
                 var observable = Data[key];
                 var oldValue = (observable as IValueReader<TIn>).Value;
 
-                Globals.Transaction(() =>
+                Reactions.Transaction(() =>
                 {
                     KeysAtom.ReportChanged();
 
@@ -232,7 +232,7 @@ namespace Skclusive.Mobx.Observable
 
         public IObservableMap<TKey, TIn, TOut> Merge(IDictionary<TKey, TOut> values)
         {
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 foreach (var item in values)
                 {
@@ -310,9 +310,9 @@ namespace Skclusive.Mobx.Observable
 
         public void Clear()
         {
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
-                Globals.Untracked<object>(() =>
+                States.Untracked<object>(() =>
                 {
                     foreach (var key in Keys.ToList())
                     {
@@ -391,7 +391,7 @@ namespace Skclusive.Mobx.Observable
 
         public IObservableMap<TKey, TIn, TOut> Replace(IDictionary<TKey, TOut> dictionary)
         {
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 var newKeys = dictionary.Keys;
 

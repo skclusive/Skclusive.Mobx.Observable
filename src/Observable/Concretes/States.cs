@@ -4,11 +4,11 @@ using System.Threading;
 
 namespace Skclusive.Mobx.Observable
 {
-    public partial class Globals
+    internal class States
     {
         private static ThreadLocal<State> _LocalState = new ThreadLocal<State>(() => new State());
 
-        public static State State { get => _LocalState.Value; }
+        internal static State State { get => _LocalState.Value; }
 
         private static int MAX_REACTION_ITERATIONS = 100;
 
@@ -70,16 +70,16 @@ namespace Skclusive.Mobx.Observable
         }
 
         /**
- * Batch starts a transaction, at least for purposes of memoizing ComputedValues when nothing else does.
- * During a batch `onBecomeUnobserved` will be called at most once per observable.
- * Avoids unnecessary recalculations.
- */
-        private static void StartBatch()
+        * Batch starts a transaction, at least for purposes of memoizing ComputedValues when nothing else does.
+        * During a batch `onBecomeUnobserved` will be called at most once per observable.
+        * Avoids unnecessary recalculations.
+        */
+        internal static void StartBatch()
         {
             State.InBatch++;
         }
 
-        private static void EndBatch()
+        internal static void EndBatch()
         {
             if (--State.InBatch == 0)
             {
@@ -112,13 +112,12 @@ namespace Skclusive.Mobx.Observable
         }
 
         /**
- * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly
- * It will propagate changes to observers from previous run
- * It's hard or maybe impossible (with reasonable perf) to get it right with current approach
- * Hopefully self reruning autoruns aren't a feature people should depend on
- * Also most basic use cases should be ok
- */
-
+        * NOTE: current propagation mechanism will in case of self reruning autoruns behave unexpectedly
+        * It will propagate changes to observers from previous run
+        * It's hard or maybe impossible (with reasonable perf) to get it right with current approach
+        * Hopefully self reruning autoruns aren't a feature people should depend on
+        * Also most basic use cases should be ok
+        */
         public static IDerivation UntrackedStart(IDerivation current = null)
         {
             var previous = State.TrackingDerivation;

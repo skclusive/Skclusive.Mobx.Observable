@@ -13,12 +13,12 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var observable = ObservableValue<int>.From(0);
 
-            Globals.Autorun(r =>
+            Reactions.Autorun(r =>
             {
                 values.Add(observable.Value);
             });
 
-            var increment = Globals.CreateAction<int, int>("Increment", (amount) =>
+            var increment = Actions.CreateAction<int, int>("Increment", (amount) =>
             {
                 observable.Value += amount * 2;
 
@@ -43,14 +43,14 @@ namespace Skclusive.Mobx.Observable.Tests
             var i = 3;
             var b = 0;
 
-            Globals.Autorun(r =>
+            Reactions.Autorun(r =>
             {
                 b = a.Value * 2;
             });
 
             Assert.Equal(2, b);
 
-            var action = Globals.CreateAction("action", () =>
+            var action = Actions.CreateAction("action", () =>
             {
                 a.Value = ++i;
             });
@@ -70,14 +70,14 @@ namespace Skclusive.Mobx.Observable.Tests
             var a = ObservableValue<int>.From(1);
             var b = 0;
 
-            Globals.Autorun(r =>
+            Reactions.Autorun(r =>
             {
                 b = a.Value * 2;
             });
 
             Assert.Equal(2, b);
 
-            var action = Globals.CreateAction("action", () =>
+            var action = Actions.CreateAction("action", () =>
             {
                 a.Value = a.Value + 1; // ha, no loop!
             });
@@ -107,7 +107,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             Assert.Equal(2, b);
 
-            var action = Globals.CreateAction("action", () =>
+            var action = Actions.CreateAction("action", () =>
             {
                 a.Value = a.Value + 1; // ha, no loop!
             });
@@ -130,13 +130,13 @@ namespace Skclusive.Mobx.Observable.Tests
             var latest = 0;
             var runs = 0;
 
-            var action = Globals.CreateAction<int>("action", (baseValue) =>
+            var action = Actions.CreateAction<int>("action", (baseValue) =>
             {
                 b.Value = baseValue * 2;
                 latest = b.Value; // without action this would trigger loop
             });
 
-            var d = Globals.Autorun(r =>
+            var d = Reactions.Autorun(r =>
             {
                 runs++;
                 var current = a.Value;
@@ -179,9 +179,9 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var values = new List<int>();
 
-            var adder = Globals.CreateAction<int, IDisposable>("incr", (incr) =>
+            var adder = Actions.CreateAction<int, IDisposable>("incr", (incr) =>
             {
-                return Globals.Autorun(() =>
+                return Reactions.Autorun(() =>
                 {
                     values.Add(a.Value + incr);
                 });
@@ -212,7 +212,7 @@ namespace Skclusive.Mobx.Observable.Tests
         {
             var a = ObservableValue<int>.From(2);
 
-            var action = Globals.CreateAction("action", () =>
+            var action = Actions.CreateAction("action", () =>
             {
                 a.Value = 3;
             });
@@ -223,7 +223,7 @@ namespace Skclusive.Mobx.Observable.Tests
                 return null;
             });
 
-            var d = Globals.Autorun(() =>
+            var d = Reactions.Autorun(() =>
             {
                 // expect not to throws
                 var x = c.Value;
@@ -237,13 +237,13 @@ namespace Skclusive.Mobx.Observable.Tests
         public void TestAllowModificationInComputed()
         {
             var a = ObservableValue<int>.From(2);
-            var d = Globals.Autorun(() => { var x = a.Value; });
+            var d = Reactions.Autorun(() => { var x = a.Value; });
 
             IComputedValue<int> c2 = null;
 
-            var action = Globals.CreateAction("action", () =>
+            var action = Actions.CreateAction("action", () =>
             {
-                Globals.AllowStateChangesInsideComputed(() =>
+                Actions.AllowStateChangesInsideComputed(() =>
                 {
                     a.Value = 3;
 
@@ -288,9 +288,9 @@ namespace Skclusive.Mobx.Observable.Tests
         public void TestModificationErrorInComputed()
         {
             var a = ObservableValue<int>.From(2);
-            var d = Globals.Autorun(() => { var x = a.Value; });
+            var d = Reactions.Autorun(() => { var x = a.Value; });
 
-            var action = Globals.CreateAction("action", () =>
+            var action = Actions.CreateAction("action", () =>
             {
                 a.Value = 3;
             });
@@ -317,9 +317,9 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var values = new List<int>();
 
-            var multiplier = Globals.CreateAction<int, int>("multiplier", (val) => val * b.Value);
+            var multiplier = Actions.CreateAction<int, int>("multiplier", (val) => val * b.Value);
 
-            var d = Globals.Autorun(() =>
+            var d = Reactions.Autorun(() =>
             {
                 values.Add(multiplier(a.Value));
             });
@@ -342,9 +342,9 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var values = new List<int>();
 
-            var d = Globals.Autorun(() => values.Add(observable.Value));
+            var d = Reactions.Autorun(() => values.Add(observable.Value));
 
-            var res = Globals.RunInAction<int>("increment", () =>
+            var res = Actions.RunInAction<int>("increment", () =>
             {
                 observable.Value = observable.Value + 6 * 2;
                 observable.Value = observable.Value - 3; // oops
@@ -354,7 +354,7 @@ namespace Skclusive.Mobx.Observable.Tests
             Assert.Equal(2, res);
             Assert.Equal(new[] { 0, 9 }, values.ToArray());
 
-            res = Globals.RunInAction<int>("another", () =>
+            res = Actions.RunInAction<int>("another", () =>
             {
                 observable.Value = observable.Value + 5 * 2;
                 observable.Value = observable.Value - 4; // oops
@@ -381,7 +381,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             Action<Action> runWithMemoizing = (fun) =>
             {
-                Globals.Autorun(fun).Dispose();
+                Reactions.Autorun(fun).Dispose();
             };
 
             callComputedTwice();
@@ -395,7 +395,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             runWithMemoizing(() =>
             {
-                Globals.RunInAction<int>("x", () =>
+                Actions.RunInAction<int>("x", () =>
                 {
                     callComputedTwice();
                     return 0;
@@ -419,7 +419,7 @@ namespace Skclusive.Mobx.Observable.Tests
                 return number.Value * number.Value;
             });
 
-            var changeNumber10Times = Globals.CreateAction("changeNumber10Times", () =>
+            var changeNumber10Times = Actions.CreateAction("changeNumber10Times", () =>
             {
                 var x = squared.Value;
                 var y = squared.Value;
@@ -432,7 +432,7 @@ namespace Skclusive.Mobx.Observable.Tests
             changeNumber10Times();
             Assert.Equal(1, calls);
 
-            Globals.Autorun(r =>
+            Reactions.Autorun(r =>
             {
                 changeNumber10Times();
                 Assert.Equal(2, calls);

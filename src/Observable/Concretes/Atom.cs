@@ -6,7 +6,7 @@ namespace Skclusive.Mobx.Observable
     {
         public Atom(string name)
         {
-            Name = name ?? $"Atom@{Globals.NextId}";
+            Name = name ?? $"Atom@{States.NextId}";
         }
 
         public int DiffValue { set; get; }
@@ -50,7 +50,7 @@ namespace Skclusive.Mobx.Observable
      */
         public void ReportChanged()
         {
-            Globals.Transaction(() => this.PropagateChanged());
+            Reactions.Transaction(() => this.PropagateChanged());
         }
 
     /**

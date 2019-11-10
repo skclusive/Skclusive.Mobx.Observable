@@ -78,7 +78,7 @@ namespace Skclusive.Mobx.Observable
 
         public static bool ReportObserved(this IObservable observable)
         {
-            var derivation = Globals.State.TrackingDerivation;
+            var derivation = States.State.TrackingDerivation;
             if (derivation != null)
             {
                 /**
@@ -102,7 +102,7 @@ namespace Skclusive.Mobx.Observable
                 }
                 return true;
             }
-            else if (observable.Observers.Count == 0 && Globals.State.InBatch > 0)
+            else if (observable.Observers.Count == 0 && States.State.InBatch > 0)
             {
                 QueueForUnobservation(observable);
             }
@@ -116,7 +116,7 @@ namespace Skclusive.Mobx.Observable
                 // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
                 observable.IsPendingUnobservation = true;
 
-                Globals.State.PendingUnobservations.Add(observable);
+                States.State.PendingUnobservations.Add(observable);
             }
         }
 

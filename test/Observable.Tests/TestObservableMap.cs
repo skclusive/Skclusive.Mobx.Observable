@@ -106,17 +106,17 @@ namespace Skclusive.Mobx.Observable.Tests
             object valueX = null;
             object valueY = null;
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 hasX = map.Has("x");
             });
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 valueX = map["x"];
             });
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 valueY = map["y"];
             });
@@ -171,17 +171,17 @@ namespace Skclusive.Mobx.Observable.Tests
             IList<object> values = null;
             IList<KeyValuePair<object, object>> entries = null;
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 keys = map.Keys.ToList();
             });
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 values = map.Values.ToList();
             });
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 entries = map.ToList();
             });

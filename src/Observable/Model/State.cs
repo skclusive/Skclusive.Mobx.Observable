@@ -6,10 +6,10 @@ namespace Skclusive.Mobx.Observable
     public class State
     {
         /**
-     * Globals version.
-     * compatiblity with other versions loaded in memory as long as this version matches.
-     * It indicates that the global state still stores similar information
-     */
+        * States version.
+        * compatiblity with other versions loaded in memory as long as this version matches.
+        * It indicates that the global state still stores similar information
+        */
         public int Version { get => 1; }
 
         /**
@@ -23,8 +23,8 @@ namespace Skclusive.Mobx.Observable
         public int ComputationDepth { get; set; } = 0;
 
         /**
-    * Each time a derivation is tracked, it is assigned a unique run-id
-    */
+        * Each time a derivation is tracked, it is assigned a unique run-id
+        */
         public int RunId { get; set; } = 0;
 
         /**
@@ -38,48 +38,46 @@ namespace Skclusive.Mobx.Observable
         public int InBatch { get; set; } = 0;
 
         /**
-     * Observables that don't have observers anymore, and are about to be
-     * suspended, unless somebody else accesses it in the same batch
-     *
-     * @type {IObservable[]}
-     */
+        * Observables that don't have observers anymore, and are about to be
+        * suspended, unless somebody else accesses it in the same batch
+        *
+        * @type {IObservable[]}
+        */
         public IList<IObservable> PendingUnobservations { get; set; } = new List<IObservable>();
 
         /**
-    * List of scheduled, not yet executed, reactions.
-    */
+        * List of scheduled, not yet executed, reactions.
+        */
         public IList<Reaction> PendingReactions { get; set; } = new List<Reaction>();
 
 
         /**
-    * Are we currently processing reactions?
-    */
+        * Are we currently processing reactions?
+        */
         public bool IsRunningReactions { set; get; }
 
         /**
-    * Is it allowed to change observables at this point?
-    * In general, MobX doesn't allow that when running computations and React.render.
-    * To ensure that those functions stay pure.
-    */
+        * Is it allowed to change observables at this point?
+        * In general, MobX doesn't allow that when running computations and React.render.
+        * To ensure that those functions stay pure.
+        */
         public bool AllowStateChanges { set; get; }
 
         /**
-    * If strict mode is enabled, state changes are by default not allowed
-    */
+        * If strict mode is enabled, state changes are by default not allowed
+        */
         public bool EnforceActions { set; get; }
-
 
         public IList<Action<object>> SpyListeners { get; set; } = new List<Action<object>>();
 
-
         /**
-   * Globally attached error handlers that react specifically to errors in reactions
-   */
+        * Globally attached error handlers that react specifically to errors in reactions
+        */
         public IList<Action<object, IDerivation>> ReactionErrorHandlers { get; set; } = new List<Action<object, IDerivation>>();
 
         /**
-     * Warn if computed values are accessed outside a reactive context
-     */
+        * Warn if computed values are accessed outside a reactive context
+        */
         public bool ComputedRequiresReaction { get; set; }
 
         /*

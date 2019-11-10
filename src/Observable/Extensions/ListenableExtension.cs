@@ -21,13 +21,13 @@ namespace Skclusive.Mobx.Observable
 
         public static void NotifyListeners<T>(this IListenable<T> listenable, T change)
         {
-            var tracked = Globals.UntrackedStart();
+            var tracked = States.UntrackedStart();
             var listeners = listenable.Listeners.ToList();
             foreach (var listener in listeners)
             {
                 listener(change);
             }
-            Globals.UntrackedEnd(tracked);
+            States.UntrackedEnd(tracked);
         }
     }
 }

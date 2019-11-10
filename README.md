@@ -126,7 +126,7 @@ when the top-most action has completed.
 ```C#
 var counter = ObservableValue<int>.From(0);
 
-var increment = Globals.CreateAction<int, int>("Increment", (amount) =>
+var increment = Actions.CreateAction<int, int>("Increment", (amount) =>
 {
     counter.Value += amount * 2;
 
@@ -148,7 +148,7 @@ One _striking feature_ of reactions is that they _automatically track_ all the o
 
 > The code you write with MobX appears to be literally ceremony-free!
 
-**`IReactionDisposable Globals.Autorun(Action<IReactionPublic> action)`**
+**`IReactionDisposable Reactions.Autorun(Action<IReactionPublic> action)`**
 
 Runs the reaction immediately and also on any change in the observables used inside
 `action`.
@@ -158,7 +158,7 @@ using Skclusive.Mobx.Observable;
 
 var greeting = ObservableValue<string>.From("Hello World");
 
-var disposable = Globals.Autorun((_) =>
+var disposable = Reactions.Autorun((_) =>
 {
     System.Console.WriteLine(greeting.Value);
 });
@@ -173,7 +173,7 @@ disposable.Dispose();
 // Hello MobX
 ```
 
-**`IReactionDisposable Globals.Reaction<T>(Func<IReactionPublic, T> expression, Action<T, IReactionPublic> effect)`**
+**`IReactionDisposable Reactions.Reaction<T>(Func<IReactionPublic, T> expression, Action<T, IReactionPublic> effect)`**
 
 Monitors the observables used inside the `predicate()` function and runs the `effect()` when
 the predicate returns a different value. Only the observables inside `predicate()` are tracked.
@@ -183,7 +183,7 @@ using Skclusive.Mobx.Observable;
 
 var greeting = ObservableValue<string>.From("Hello World");
 
-var disposable = Globals.Reaction<string>((reaction) => greeting.Value, (value, reaction) =>
+var disposable = Reactions.Reaction<string>((reaction) => greeting.Value, (value, reaction) =>
 {
     System.Console.WriteLine(greeting.Value);
 });

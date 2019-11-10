@@ -41,7 +41,7 @@ namespace Skclusive.Mobx.Observable
         {
             _Value = default(T);
             Derivation = options.Derivation;
-            Name = options.Name ?? $"ComputedValue@{Globals.NextId}";
+            Name = options.Name ?? $"ComputedValue@{States.NextId}";
             Scope = options.Context;
             RequiresReaction = options.RequiresReaction;
             KeepAlive = options.KeepAlive;
@@ -83,7 +83,7 @@ namespace Skclusive.Mobx.Observable
 
         public int UnboundDepsCount { set; get; }
 
-        public string MapId { set; get; } = $"#{Globals.NextId}";
+        public string MapId { set; get; } = $"#{States.NextId}";
 
         public string TriggeredBy { private set; get; }
 
@@ -117,7 +117,7 @@ namespace Skclusive.Mobx.Observable
                 {
                     FirstGet = false;
 
-                    Globals.Autorun((view) => { var x = Value; });
+                    Reactions.Autorun((view) => { var x = Value; });
                 }
 
                 if (IsComputing)
@@ -125,13 +125,13 @@ namespace Skclusive.Mobx.Observable
                     throw new InvalidOperationException($"Cycle detected in computation {Name}");
                 }
 
-                if (Globals.State.InBatch == 0 && Observers.Count == 0)
+                if (States.State.InBatch == 0 && Observers.Count == 0)
                 {
                     if (this.ShouldCompute())
                     {
                         WarnAboutUntrackedRead();
                         // See perf test 'computed memoization'
-                        _Value = Globals.Transaction(() => Compute(false));
+                        _Value = Reactions.Transaction(() => Compute(false));
                     }
                 }
                 else
@@ -159,7 +159,7 @@ namespace Skclusive.Mobx.Observable
                 throw new Exception($"[mobx.trace] {Name} is being read outside a reactive context. Doing a full recompute");
             }
 
-            if (Globals.State.ComputedRequiresReaction)
+            if (States.State.ComputedRequiresReaction)
             {
                 throw new Exception($"[mobx] Computed value {Name} is being read outside a reactive context. Doing a full recompute");
             }
@@ -169,7 +169,7 @@ namespace Skclusive.Mobx.Observable
         {
             IsComputing = true;
 
-            Globals.State.ComputationDepth++;
+            States.State.ComputationDepth++;
 
             T result;
 
@@ -186,7 +186,7 @@ namespace Skclusive.Mobx.Observable
             }
             finally
             {
-                Globals.State.ComputationDepth--;
+                States.State.ComputationDepth--;
                 IsComputing = false;
             }
             return result;
@@ -232,14 +232,14 @@ namespace Skclusive.Mobx.Observable
         {
             var firstTime = true;
             T previous = default(T);
-            return Globals.Autorun((reaction) =>
+            return Reactions.Autorun((reaction) =>
             {
                 var newvalue = Value;
                 if (!firstTime || force)
                 {
-                    var tracked = Globals.UntrackedStart();
+                    var tracked = States.UntrackedStart();
                     listener(new ValueDidChange<T>(newvalue, previous, this));
-                    Globals.UntrackedEnd(tracked);
+                    States.UntrackedEnd(tracked);
                 }
                 firstTime = false;
                 previous = newvalue;

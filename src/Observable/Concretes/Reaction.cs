@@ -11,7 +11,7 @@ namespace Skclusive.Mobx.Observable
 
         public int UnboundDepsCount { set; get; }
 
-        public string MapId { set; get; } = $"#{Globals.NextId}";
+        public string MapId { set; get; } = $"#{States.NextId}";
 
         public TraceMode Mode { set; get; } = TraceMode.NONE;
 
@@ -37,7 +37,7 @@ namespace Skclusive.Mobx.Observable
 
         public Reaction(string name, Action<Reaction> onInvalidate, Action<object, IDerivation> errorHandler)
         {
-            Name = name ?? $"Reaction@{Globals.NextId}";
+            Name = name ?? $"Reaction@{States.NextId}";
 
             OnInvalidate = onInvalidate;
 
@@ -53,7 +53,7 @@ namespace Skclusive.Mobx.Observable
                 if (!IsRunning)
                 {
                     // if disposed while running, clean up later. Maybe not optimal, but rare case
-                    Globals.Transaction(() => this.ClearObservings());
+                    Reactions.Transaction(() => this.ClearObservings());
                 }
             }
         }
@@ -68,8 +68,8 @@ namespace Skclusive.Mobx.Observable
             if (!IsScheduled)
             {
                 IsScheduled = true;
-                Globals.State.PendingReactions.Add(this);
-                Globals.RunReactions();
+                States.State.PendingReactions.Add(this);
+                States.RunReactions();
             }
         }
 
@@ -83,7 +83,7 @@ namespace Skclusive.Mobx.Observable
                 return;
             }
 
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 IsScheduled = false;
                 if (this.ShouldCompute())
@@ -114,7 +114,7 @@ namespace Skclusive.Mobx.Observable
                 return;
             }
 
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
 
                 IsRunning = true;
@@ -152,7 +152,7 @@ namespace Skclusive.Mobx.Observable
                 return;
             }
 
-            if (Globals.State.DisableErrorBoundaries)
+            if (States.State.DisableErrorBoundaries)
             {
                 return;
             }
@@ -169,7 +169,7 @@ namespace Skclusive.Mobx.Observable
             //    })
             //}
 
-            foreach (var handler in Globals.State.ReactionErrorHandlers)
+            foreach (var handler in States.State.ReactionErrorHandlers)
             {
                 handler(error, this);
             }

@@ -19,7 +19,7 @@ namespace Skclusive.Mobx.Observable
 
         public static T NotifyInterceptors<T>(this IInterceptable<T> interceptable, T change)
         {
-            var tracked = Globals.UntrackedStart();
+            var tracked = States.UntrackedStart();
             try
             {
                 var interceptors = interceptable.Interceptors.ToList();
@@ -35,7 +35,7 @@ namespace Skclusive.Mobx.Observable
             }
             finally
             {
-                Globals.UntrackedEnd(tracked);
+                States.UntrackedEnd(tracked);
             }
         }
     }

@@ -132,13 +132,13 @@ namespace Skclusive.Mobx.Observable.Tests
             Assert.NotNull(order);
 
             var prices = new List<double>();
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 prices.Add(order.Price);
             });
 
             var pricesWithVat = new List<double>();
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 pricesWithVat.Add(order.PriceWithVat);
             });
@@ -190,13 +190,13 @@ namespace Skclusive.Mobx.Observable.Tests
             Assert.NotNull(order);
 
             var prices = new List<double>();
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 prices.Add(order.Price);
             });
 
             var pricesWithVat = new List<double>();
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 pricesWithVat.Add(order.PriceWithVat);
             });
@@ -241,13 +241,13 @@ namespace Skclusive.Mobx.Observable.Tests
         //    Assert.NotNull(order);
 
         //    var prices = new List<double>();
-        //    Globals.Autorun((r) =>
+        //    Reactions.Autorun((r) =>
         //    {
         //        prices.Add(order.Price);
         //    });
 
         //    var pricesWithVat = new List<double>();
-        //    Globals.Autorun((r) =>
+        //    Reactions.Autorun((r) =>
         //    {
         //        pricesWithVat.Add(order.PriceWithVat);
         //    });

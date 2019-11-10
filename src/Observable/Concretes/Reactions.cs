@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Skclusive.Mobx.Observable
 {
-    public partial class Globals
+    public partial class Reactions
     {
         public static IDisposable SetTimeout(Action action, int delay)
         {
@@ -41,7 +41,7 @@ namespace Skclusive.Mobx.Observable
          */
         public static IReactionDisposable Autorun(Action<IReactionPublic> view, IAutorunOptions options = null)
         {
-            var name = options?.Name ?? $"Autorun@{NextId}";
+            var name = options?.Name ?? $"Autorun@{States.NextId}";
             var runSync = options == null || options.Scheduler != null && options.Delay == 0;
 
             Reaction _reaction = null;
@@ -89,7 +89,7 @@ namespace Skclusive.Mobx.Observable
 
         public static IReactionDisposable Reaction<T>(Func<IReactionPublic, T> expression, Action<T, IReactionPublic> effect, IReactionOptions<T> options = null)
         {
-            var name = options?.Name ?? $"Reaction@{NextId}";
+            var name = options?.Name ?? $"Reaction@{States.NextId}";
             var runSync = options == null || options.Scheduler != null && options.Delay == 0;
             var scheduler = CreateScheduler(options);
 
@@ -165,17 +165,16 @@ namespace Skclusive.Mobx.Observable
                 Comparer = new LambdaComparer<object>((a, b) => false)
             });
         }
-
         public static T Transaction<T>(Func<T> action)
         {
             try
             {
-                StartBatch();
+                States.StartBatch();
                 return action();
             }
             finally
             {
-                EndBatch();
+                States.EndBatch();
             }
         }
 

@@ -5,7 +5,7 @@ namespace Skclusive.Mobx.Observable
 {
     public class ObservableValue<TIn, TOut> : Atom, IObservableValue<TIn, TOut>
     {
-        public ObservableValue(TIn value, string name = null, IManipulator manipulator = null) : base(name ?? $"ObservableValue@{Globals.NextId}")
+        public ObservableValue(TIn value, string name = null, IManipulator manipulator = null) : base(name ?? $"ObservableValue@{States.NextId}")
         {
             Manipulator = manipulator ?? Manipulator<TIn, TOut>.For();
 

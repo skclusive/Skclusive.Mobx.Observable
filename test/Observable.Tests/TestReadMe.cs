@@ -12,7 +12,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var counts = new List<int>();
 
-            Globals.Autorun(() =>
+            Reactions.Autorun(() =>
             {
                 counts.Add(counter.Count);
             });
@@ -53,7 +53,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             contact.LastName = "Sk";
 
-            Globals.Autorun(() =>
+            Reactions.Autorun(() =>
             {
                 fullNames.Add(contact.FullName);
             });
@@ -107,7 +107,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var greetings = new List<string>();
 
-            var disposable = Globals.Autorun((_) =>
+            var disposable = Reactions.Autorun((_) =>
             {
                 // System.Console.WriteLine(greeting.Value);
 
@@ -131,7 +131,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             var greetings = new List<string>();
 
-            var disposable = Globals.Reaction<string>((reaction) => greeting.Value, (value, reaction) =>
+            var disposable = Reactions.Reaction<string>((reaction) => greeting.Value, (value, reaction) =>
             {
                 // System.Console.WriteLine(greeting.Value);
 
@@ -143,7 +143,7 @@ namespace Skclusive.Mobx.Observable.Tests
             // done with reaction()
             disposable.Dispose();
 
-            Assert.Equal(1, greetings.Count);
+            Assert.Single(greetings);
             Assert.Equal("Hello Mobx", greetings[0]);
         }
     }

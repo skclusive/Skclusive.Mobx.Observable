@@ -232,7 +232,7 @@ namespace Skclusive.Mobx.Observable.Tests
             var list = ObservableList<int>.From();
             var count = 0;
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 var x = list.ToString();
                 count++;
@@ -256,7 +256,7 @@ namespace Skclusive.Mobx.Observable.Tests
                  return splice;
             });
 
-            Globals.Autorun((r) =>
+            Reactions.Autorun((r) =>
             {
                 sorted = sortedX.Value;
             });

@@ -25,7 +25,7 @@ namespace Skclusive.Mobx.Observable
         {
             Values = new List<TIn>();
 
-            Name = name ?? $"ObservableArray@{Globals.NextId}";
+            Name = name ?? $"ObservableArray@{States.NextId}";
 
             Manipulator = manipulator ?? Manipulator<TIn, TOut>.For();
 
@@ -38,11 +38,11 @@ namespace Skclusive.Mobx.Observable
 
             if (values != null)
             {
-                var previous = Globals.AllowStateChangesStart(true);
+                var previous = Actions.AllowStateChangesStart(true);
 
                 list.SpliceWith(0, 0, values.ToArray());
 
-                Globals.AllowStateChangesEnd(previous);
+                Actions.AllowStateChangesEnd(previous);
             }
 
             return list;
@@ -386,11 +386,11 @@ namespace Skclusive.Mobx.Observable
 
             if (values != null)
             {
-                var previous = Globals.AllowStateChangesStart(true);
+                var previous = Actions.AllowStateChangesStart(true);
 
                 list.SpliceWith(0, 0, values.ToArray());
 
-                Globals.AllowStateChangesEnd(previous);
+                Actions.AllowStateChangesEnd(previous);
             }
 
             return list;

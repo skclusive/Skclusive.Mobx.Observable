@@ -116,49 +116,49 @@ namespace Skclusive.Mobx.Observable
         public ObservableTypeDefBuilder<T> Action<A1, R>(Expression<Action<T>> expression, Func<T, A1, R> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1, A2, R>(Expression<Action<T>> expression, Func<T, A1, A2, R> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1, A2, A3, R>(Expression<Action<T>> expression, Func<T, A1, A2, A3, R> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1, A2, A3, A4, R>(Expression<Action<T>> expression, Func<T, A1, A2, A3, A4, R> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1>(Expression<Action<T>> expression, Action<T, A1> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1, A2>(Expression<Action<T>> expression, Action<T, A1, A2> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1, A2, A3>(Expression<Action<T>> expression, Action<T, A1, A2, A3> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDefBuilder<T> Action<A1, A2, A3, A4>(Expression<Action<T>> expression, Action<T, A1, A2, A3, A4> func)
         {
             var method = ExpressionUtils.GetMethodSymbol(expression);
-            return Action(method, Globals.WrapAction(method, func));
+            return Action(method, Actions.WrapAction(method, func));
         }
 
         public ObservableTypeDef Build()

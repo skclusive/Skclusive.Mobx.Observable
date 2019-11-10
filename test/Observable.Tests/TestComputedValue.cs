@@ -14,7 +14,7 @@ namespace Skclusive.Mobx.Observable.Tests
             var writer = box as IValueWriter<int>;
 
             var values = new List<int>();
-            Globals.Autorun((reaction) =>
+            Reactions.Autorun((reaction) =>
             {
                 Assert.NotNull(reaction);
                 if (reader.Value == -1)
@@ -70,7 +70,7 @@ namespace Skclusive.Mobx.Observable.Tests
             var x = ComputedValue<int>.From(() => reader.Value * 2);
 
             var values = new List<int>();
-            Globals.Autorun((reaction) =>
+            Reactions.Autorun((reaction) =>
             {
                 values.Add(x.Value);
             });
@@ -111,7 +111,7 @@ namespace Skclusive.Mobx.Observable.Tests
 
             Assert.Equal(9, y.Value);
 
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 x1writer.Value = 5;
                 x2writer.Value = 6;
@@ -256,7 +256,7 @@ namespace Skclusive.Mobx.Observable.Tests
             Assert.Equal(36, values[0]);
             Assert.Equal(100, values[1]);
 
-            var x = Globals.Transaction<int>(() =>
+            var x = Reactions.Transaction<int>(() =>
             {
                 awriter.Value = 2;
                 bwriter.Value = 3;
@@ -290,7 +290,7 @@ namespace Skclusive.Mobx.Observable.Tests
             });
 
             // if not inspected during transaction, postpone value to end
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 awriter.Value = 3;
                 Assert.Equal(6, b.Value);
@@ -301,7 +301,7 @@ namespace Skclusive.Mobx.Observable.Tests
             Assert.Equal(2, calcs);
 
             // if inspected, evaluate eagerly
-            Globals.Transaction(() =>
+            Reactions.Transaction(() =>
             {
                 awriter.Value = 4;
                 Assert.Equal(8, b.Value);

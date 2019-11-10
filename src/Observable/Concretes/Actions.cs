@@ -2,11 +2,11 @@
 
 namespace Skclusive.Mobx.Observable
 {
-    public partial class Globals
+    public class Actions
     {
         #region Core Actions
 
-        public static object ExecuteAction(string name, Func<object[], object> action, object[] arguments)
+        internal static object ExecuteAction(string name, Func<object[], object> action, object[] arguments)
         {
             IActionRunInfo actionInfo = StartAction(name, action, arguments);
             var shouldSupressReactionError = true;
@@ -19,11 +19,11 @@ namespace Skclusive.Mobx.Observable
 
                 if (shouldSupressReactionError)
                 {
-                    State.SuppressReactionErrors = shouldSupressReactionError;
+                    States.State.SuppressReactionErrors = shouldSupressReactionError;
 
                     EndAction(actionInfo);
 
-                    State.SuppressReactionErrors = false;
+                    States.State.SuppressReactionErrors = false;
                 }
                 else
                 {
@@ -34,9 +34,9 @@ namespace Skclusive.Mobx.Observable
 
         private static IActionRunInfo StartAction(string name, Func<object[], object> action, object[] arguments)
         {
-            var derivation = UntrackedStart();
+            var derivation = States.UntrackedStart();
 
-            StartBatch();
+            States.StartBatch();
 
             var allowStateChanges = AllowStateChangesStart(true);
 
@@ -58,9 +58,9 @@ namespace Skclusive.Mobx.Observable
         {
             AllowStateChangesEnd(actionInfo.AllowStateChanges);
 
-            EndBatch();
+            States.EndBatch();
 
-            UntrackedEnd(actionInfo.Derivation);
+            States.UntrackedEnd(actionInfo.Derivation);
         }
 
         public static T AllowStateChanges<T>(bool allowStateChanges, Func<T> action)
@@ -79,32 +79,33 @@ namespace Skclusive.Mobx.Observable
 
         public static bool AllowStateChangesStart(bool allowStateChanges)
         {
-            var previous = State.AllowStateChanges;
+            var previous = States.State.AllowStateChanges;
 
-            State.AllowStateChanges = allowStateChanges;
+            States.State.AllowStateChanges = allowStateChanges;
 
             return previous;
         }
 
         public static bool AllowStateChangesEnd(bool allowStateChangesPrevious)
         {
-            State.AllowStateChanges = allowStateChangesPrevious;
+            States.State.AllowStateChanges = allowStateChangesPrevious;
 
             return allowStateChangesPrevious;
         }
 
         public static T AllowStateChangesInsideComputed<T>(Func<T> action)
         {
-            var prev = State.ComputationDepth;
+            var prev = States.State.ComputationDepth;
 
-            State.ComputationDepth = 0;
+            States.State.ComputationDepth = 0;
+
             try
             {
                 return action();
             }
             finally
             {
-                State.ComputationDepth = prev;
+                States.State.ComputationDepth = prev;
             }
         }
 
@@ -119,9 +120,9 @@ namespace Skclusive.Mobx.Observable
 
         #endregion
 
-            #region Func WrapActions
+        #region Func WrapActions
 
-            public static Func<object[], object> WrapAction<R>(string name, Func<R> action)
+        public static Func<object[], object> WrapAction<R>(string name, Func<R> action)
         {
             return CreateAction(name, action.Pack());
         }

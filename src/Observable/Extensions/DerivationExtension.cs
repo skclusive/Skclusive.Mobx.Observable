@@ -16,12 +16,12 @@ namespace Skclusive.Mobx.Observable
                     return true;
                 case DerivationState.POSSIBLY_STALE:
                     {
-                        var prevUntracked = Globals.UntrackedStart(); // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
+                        var prevUntracked = States.UntrackedStart(); // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
                         foreach (var observer in derivation.Observings)
                         {
                             if (observer is IComputedValue computed)
                             {
-                                if (Globals.State.DisableErrorBoundaries)
+                                if (States.State.DisableErrorBoundaries)
                                 {
                                     var x = computed.Value;
                                 }
@@ -34,7 +34,7 @@ namespace Skclusive.Mobx.Observable
                                     catch
                                     {
                                         // we are not interested in the value *or* exception at this moment, but if there is one, notify all
-                                        Globals.UntrackedEnd(prevUntracked);
+                                        States.UntrackedEnd(prevUntracked);
                                         return true;
                                     }
                                 }
@@ -43,13 +43,13 @@ namespace Skclusive.Mobx.Observable
                                 // invariantShouldCompute(derivation)
                                 if (derivation.DependenciesState == DerivationState.STALE)
                                 {
-                                    Globals.UntrackedEnd(prevUntracked);
+                                    States.UntrackedEnd(prevUntracked);
                                     return true;
                                 }
                             }
                         }
                         derivation.ChangeDependenciesStateTo0();
-                        Globals.UntrackedEnd(prevUntracked);
+                        States.UntrackedEnd(prevUntracked);
                         return false;
                     }
                 default:
@@ -179,13 +179,13 @@ namespace Skclusive.Mobx.Observable
 
             derivation.NewObservings = new List<IObservable>(derivation.Observings.Count + 100);
             derivation.UnboundDepsCount = 0;
-            derivation.RunId = Globals.NextRunId;
+            derivation.RunId = States.NextRunId;
 
-            var previous = Globals.UntrackedStart(derivation);
+            var previous = States.UntrackedStart(derivation);
 
             T result = default(T);
 
-            if (Globals.State.DisableErrorBoundaries)
+            if (States.State.DisableErrorBoundaries)
             {
                 result = func();
             }
@@ -201,7 +201,7 @@ namespace Skclusive.Mobx.Observable
                 }
             }
 
-            Globals.UntrackedEnd(previous);
+            States.UntrackedEnd(previous);
             derivation.BindDependencies();
             return result;
         }
