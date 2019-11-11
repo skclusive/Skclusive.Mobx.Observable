@@ -196,3 +196,11 @@ disposable.Dispose();
 // Prints:
 // Hello MobX
 ```
+
+## Credits
+
+This is an attempt to port [mobx](https://github.com/mobxjs/mobx) to dotnet-standard C# libaray.
+
+## License
+
+Skclusive.Mobx.Observable is licensed under [MIT license](http://www.opensource.org/licenses/mit-license.php)
