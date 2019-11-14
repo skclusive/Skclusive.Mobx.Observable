@@ -197,6 +197,10 @@ disposable.Dispose();
 // Hello MobX
 ```
 
+### Installation
+
+Add a reference to the library from [![NuGet](https://img.shields.io/nuget/v/Skclusive.Mobx.Observable.svg)](https://www.nuget.org/packages/Skclusive.Mobx.Observable/)
+
 ## Credits
 
 This is an attempt to port [mobx](https://github.com/mobxjs/mobx) to dotnet-standard C# libaray.

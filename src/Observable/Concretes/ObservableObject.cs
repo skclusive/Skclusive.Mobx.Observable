@@ -250,7 +250,8 @@ namespace Skclusive.Mobx.Observable
                 var change = this.NotifyInterceptors(new ObjectWillChange<object>(key, ChangeType.UPDATE, value, Proxy));
                 if (change == null)
                 {
-                    return false;
+                    // TODO: investigate with tests
+                    return true;
                 }
 
                 value = change.NewValue;
@@ -269,9 +270,9 @@ namespace Skclusive.Mobx.Observable
                     {
                         this.NotifyListeners(new ObjectDidChange<object>(key, ChangeType.UPDATE, newValue, oldValue, Proxy));
                     }
-
-                    return true;
                 }
+
+                return true;
             }
 
             return false;
