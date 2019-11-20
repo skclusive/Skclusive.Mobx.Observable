@@ -22,7 +22,7 @@ namespace Skclusive.Mobx.Observable
      *
      * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
      */
-    public class ComputedValue<T> : IComputedValue<T>, IObservable, IDerivation
+    public class ComputedValue<T> : IComputedValue<T>, IObservable, IDerivation, IDepTreeNodeClassifier
     {
 
         /**
@@ -54,6 +54,10 @@ namespace Skclusive.Mobx.Observable
         }
 
         public object Scope { private set; get; }
+
+        DepTreeNodeType IDepTreeNodeClassifier.AtomType => DepTreeNodeType.Computed;
+
+        IDepTreeNode IDepTreeNodeClassifier.Node => this;
 
         private IEqualityComparer<T> Comparer { set; get; }
 
@@ -192,7 +196,7 @@ namespace Skclusive.Mobx.Observable
             return result;
         }
 
-        private bool TrackAndCompute()
+        public bool TrackAndCompute()
         {
             var oldValue = (T)_Value;
             var wasSuspended = DependenciesState == DerivationState.NOT_TRACKING;

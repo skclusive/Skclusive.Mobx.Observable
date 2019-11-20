@@ -5,6 +5,8 @@ namespace Skclusive.Mobx.Observable
 {
     public partial class Reactions
     {
+        private readonly static object Null = new object();
+
         public static IDisposable SetTimeout(Action action, int delay)
         {
             return ExecutionPlan.Delay(delay, action);
@@ -127,7 +129,7 @@ namespace Skclusive.Mobx.Observable
                 reaction.Track(() =>
                 {
                     var nextValue = expression(reaction);
-                    changed = firstTime || !comparer.Equals(value, nextValue);
+                    changed = firstTime || !comparer.Equals(value, nextValue) || Null == (object)nextValue;
                     value = nextValue;
                     return value;
                 });
@@ -153,10 +155,10 @@ namespace Skclusive.Mobx.Observable
 
         public static IReactionDisposable Reaction(Action expression, Action effect, IReactionOptions<object> options = null)
         {
-            return Reaction<object>((reaction) =>
+            return Reaction((reaction) =>
             {
                 expression();
-                return null;
+                return Null;
             }, (value, reaction) =>
             {
                 effect();
@@ -180,10 +182,10 @@ namespace Skclusive.Mobx.Observable
 
         public static void Transaction(Action action)
         {
-            Transaction<object>(() =>
+            Transaction(() =>
             {
                 action();
-                return null;
+                return Null;
             });
         }
     }

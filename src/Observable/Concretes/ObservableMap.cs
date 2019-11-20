@@ -5,9 +5,13 @@ using System.Linq;
 
 namespace Skclusive.Mobx.Observable
 {
-    public class ObservableMap<TKey, TIn, TOut> : IObservableMap<TKey, TIn, TOut>
+    public class ObservableMap<TKey, TIn, TOut> : IObservableMap<TKey, TIn, TOut>, IDepTreeNodeClassifier, IDepTreeNodeFinder
     {
         private IAtom KeysAtom { set; get; }
+
+        IDepTreeNode IDepTreeNodeClassifier.Node => KeysAtom;
+
+        DepTreeNodeType IDepTreeNodeClassifier.AtomType => DepTreeNodeType.Map;
 
         private IMap<TKey, IObservableValue<TIn>> Data { set; get; }
 
@@ -47,6 +51,26 @@ namespace Skclusive.Mobx.Observable
         public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null)
         {
             return new ObservableMap<TKey, TIn, TOut>(values, name, manipulator);
+        }
+
+        IDepTreeNode IDepTreeNodeFinder.FindNode(string property)
+        {
+            TKey key = (TKey)(property as object);
+
+            object observable = Data.ContainsKey(key) ?
+                Data[key] : null;
+
+            if ( observable is null)
+            {
+                observable = HasMap.ContainsKey(key) ? HasMap[key] : null;
+            }
+
+            if (observable is IDepTreeNodeClassifier atom)
+            {
+                return atom.Node;
+            }
+
+            throw new Exception($"Not able to find Atom for property {property}");
         }
 
         public TOut Get(TKey key)

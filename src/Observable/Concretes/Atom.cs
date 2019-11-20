@@ -2,7 +2,7 @@
 
 namespace Skclusive.Mobx.Observable
 {
-    public class Atom : IAtom
+    public class Atom : IAtom, IDepTreeNodeClassifier
     {
         public Atom(string name)
         {
@@ -24,6 +24,10 @@ namespace Skclusive.Mobx.Observable
         public string Name { private set; get; }
 
         public IList<IObservable> Observings { set; get; } = new List<IObservable>();
+
+        DepTreeNodeType IDepTreeNodeClassifier.AtomType => DepTreeNodeType.Atom;
+
+        IDepTreeNode IDepTreeNodeClassifier.Node => this;
 
         public event AtomHandler OnBecomeObservedEvent;
 

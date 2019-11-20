@@ -5,9 +5,13 @@ using System.Linq;
 
 namespace Skclusive.Mobx.Observable
 {
-    public class ObservableList<TIn, TOut> : IObservableList<TIn, TOut>
+    public class ObservableList<TIn, TOut> : IObservableList<TIn, TOut>, IDepTreeNodeClassifier
     {
         private IAtom KeysAtom { set; get; }
+
+        IDepTreeNode IDepTreeNodeClassifier.Node => KeysAtom;
+
+        DepTreeNodeType IDepTreeNodeClassifier.AtomType => DepTreeNodeType.List;
 
         public string Name { private set; get; }
 

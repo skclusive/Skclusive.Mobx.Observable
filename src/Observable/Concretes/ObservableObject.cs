@@ -5,9 +5,13 @@ using System.Linq;
 
 namespace Skclusive.Mobx.Observable
 {
-    public class ObservableObject<T, W> : DynamicObject, IObservableObject<T, W> where W : class
+    public class ObservableObject<T, W> : DynamicObject, IDepTreeNodeClassifier, IDepTreeNodeFinder, IObservableObject<T, W> where W : class
     {
         private IAtom KeysAtom { set; get; }
+
+        IDepTreeNode IDepTreeNodeClassifier.Node => KeysAtom;
+
+        DepTreeNodeType IDepTreeNodeClassifier.AtomType => DepTreeNodeType.Object;
 
         public object Target { private set; get; }
 
@@ -468,6 +472,18 @@ namespace Skclusive.Mobx.Observable
             }
 
             throw new InvalidOperationException($"Not able to write property {key} with value {value}");
+        }
+
+        IDepTreeNode IDepTreeNodeFinder.FindNode(string property)
+        {
+            var observable = Values[property];
+
+            if (observable is IDepTreeNodeClassifier atom)
+            {
+                return atom.Node;
+            }
+
+            throw new Exception($"Not able to find Atom for property {property}");
         }
 
         public IList<string> Keys

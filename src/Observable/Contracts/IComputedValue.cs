@@ -12,5 +12,7 @@ namespace Skclusive.Mobx.Observable
         new T Value { get; }
 
         IDisposable Observe(Action<IValueDidChange<T>> listener, bool force = false);
+
+        bool TrackAndCompute();
     }
 }

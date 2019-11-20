@@ -3,9 +3,13 @@ using System.Collections.Generic;
 
 namespace Skclusive.Mobx.Observable
 {
-    public class Reaction : IDerivation, IReactionPublic
+    public class Reaction : IDerivation, IReactionPublic, IDepTreeNodeClassifier
     {
         public int RunId { set; get; }
+
+        DepTreeNodeType IDepTreeNodeClassifier.AtomType => DepTreeNodeType.Reaction;
+
+        IDepTreeNode IDepTreeNodeClassifier.Node => this;
 
         public int DiffValue { set; get; }
 
