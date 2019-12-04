@@ -6,9 +6,13 @@ namespace Skclusive.Mobx.Observable
 {
     internal class States
     {
-        private static AsyncLocal<State> _LocalState = new AsyncLocal<State>();
+        // private static AsyncLocal<State> _LocalState = new AsyncLocal<State>();
 
-        internal static State State { get => (_LocalState.Value ?? (_LocalState.Value = new State())); }
+        // internal static State State { get => (_LocalState.Value ?? (_LocalState.Value = new State())); }
+
+        private static ThreadLocal<State> _LocalState = new ThreadLocal<State>(() => new State());
+
+        internal static State State { get => _LocalState.Value; }
 
         private static int MAX_REACTION_ITERATIONS = 100;
 
