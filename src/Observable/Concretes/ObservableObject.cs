@@ -159,6 +159,20 @@ namespace Skclusive.Mobx.Observable
             return Remove(binder.Name);
         }
 
+        //public override bool TryConvert(ConvertBinder binder, out object result)
+        //{
+        //    if (typeof(T) == binder.Type)
+        //    {
+        //        result = this;
+        //    }
+        //    else
+        //    {
+        //        result = null;
+        //    }
+
+        //    return result != null;
+        //}
+
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
         {
             return base.TryInvoke(binder, args, out result);
