@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>3.0.4-preview1</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>Skclusive.Mobx.Observable</AssemblyName>
     <PackageId>Skclusive.Mobx.Observable</PackageId>
     <RootNamespace>Skclusive.Mobx.Observable</RootNamespace>
