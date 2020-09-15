@@ -307,11 +307,15 @@ namespace Skclusive.Mobx.Observable
 
         public IEnumerable<TIn> GetValues()
         {
+            KeysAtom.ReportObserved();
+
             return Data.Values.Select(value => (value as IValueReader<TIn>).Value);
         }
 
         public TIn GetValue(TKey key)
         {
+            KeysAtom.ReportObserved();
+
             var value = Data[key];
 
             return (value as IValueReader<TIn>).Value;
