@@ -25,7 +25,7 @@ namespace Skclusive.Mobx.Observable
 
         public IList<Action<IMapDidChange<TKey, TIn>>> Listeners { private set; get; } = new List<Action<IMapDidChange<TKey, TIn>>>();
 
-        protected ObservableMap(IDictionary<TKey, TOut> values, string name, IManipulator<TIn, TOut, TKey> manipulator = null)
+        protected ObservableMap(string name, IManipulator<TIn, TOut, TKey> manipulator = null)
         {
             Data = new Map<TKey, IObservableValue<TIn>>();
 
@@ -36,11 +36,6 @@ namespace Skclusive.Mobx.Observable
             Manipulator = manipulator ?? Manipulator<TIn, TOut, TKey>.For();
 
             KeysAtom = new Atom($"{Name}.keys()");
-
-            if (values != null)
-            {
-                Merge(values);
-            }
         }
 
         public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null)
@@ -50,7 +45,26 @@ namespace Skclusive.Mobx.Observable
 
         public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null)
         {
-            return new ObservableMap<TKey, TIn, TOut>(values, name, manipulator);
+            var observableMap = new ObservableMap<TKey, TIn, TOut>(name, manipulator);
+
+            if (values != null)
+            {
+                observableMap.Merge(values);
+            }
+
+            return observableMap;
+        }
+
+        public static IObservableMap<TKey, TIn, TOut> FromIn(IMap<TKey, TIn> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null)
+        {
+            var observableMap = new ObservableMap<TKey, TIn, TOut>(name, manipulator);
+
+            if (values != null)
+            {
+                observableMap.MergeIn(values);
+            }
+
+            return observableMap;
         }
 
         IDepTreeNode IDepTreeNodeFinder.FindNode(string property)
@@ -173,27 +187,30 @@ namespace Skclusive.Mobx.Observable
 
         public ObservableMap<TKey, TIn, TOut> Set(TKey key, TOut value)
         {
-            var hasKey = _Has(key);
+            return Set(key, Manipulator.Enhance(value));
+        }
 
-            TIn newValue = Manipulator.Enhance(value);
+        public ObservableMap<TKey, TIn, TOut> Set(TKey key, TIn value)
+        {
+            var hasKey = _Has(key);
 
             if (this.HasInterceptors())
             {
-                var change = this.NotifyInterceptors(new MapWillChange<TKey, TIn>(key, hasKey ? ChangeType.UPDATE : ChangeType.ADD, newValue, this));
+                var change = this.NotifyInterceptors(new MapWillChange<TKey, TIn>(key, hasKey ? ChangeType.UPDATE : ChangeType.ADD, value, this));
                 if (change == null)
                 {
                     return this;
                 }
-                newValue = change.NewValue;
+                value = change.NewValue;
             }
 
             if (hasKey)
             {
-                UpdateValue(key, newValue, out TIn outValue);
+                UpdateValue(key, value, out TIn outValue);
             }
             else
             {
-                AddValue(key, newValue, out TIn outValue);
+                AddValue(key, value, out TIn outValue);
             }
 
             return this;
@@ -252,6 +269,19 @@ namespace Skclusive.Mobx.Observable
             }
 
             return false;
+        }
+
+        protected IObservableMap<TKey, TIn, TOut> MergeIn(IDictionary<TKey, TIn> values)
+        {
+            Reactions.Transaction(() =>
+            {
+                foreach (var item in values)
+                {
+                    Set(item.Key, item.Value);
+                }
+            });
+
+            return this;
         }
 
         public IObservableMap<TKey, TIn, TOut> Merge(IDictionary<TKey, TOut> values)
@@ -453,13 +483,20 @@ namespace Skclusive.Mobx.Observable
 
     public class ObservableMap<TKey, TIn> : ObservableMap<TKey, TIn, TIn>, IObservableMap<TKey, TIn>
     {
-        protected ObservableMap(IDictionary<TKey, TIn> values, string name, IManipulator<TIn, TIn, TKey> manipulator = null) : base(values, name, manipulator)
+        protected ObservableMap(string name, IManipulator<TIn, TIn, TKey> manipulator = null) : base(name, manipulator)
         {
         }
 
         public static new IObservableMap<TKey, TIn> From(IMap<TKey, TIn> values = null, string name = null)
         {
-            return new ObservableMap<TKey, TIn>(values, name, null);
+            var observableMap = new ObservableMap<TKey, TIn>(name, null);
+
+            if (values != null)
+            {
+                observableMap.Merge(values);
+            }
+
+            return observableMap;
         }
     }
 }

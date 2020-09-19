@@ -52,6 +52,22 @@ namespace Skclusive.Mobx.Observable
             return list;
         }
 
+        public static IObservableList<TIn, TOut> FromIn(IEnumerable<TIn> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null)
+        {
+            var list = new ObservableList<TIn, TOut>(name, manipulator);
+
+            if (values != null)
+            {
+                var previous = Actions.AllowStateChangesStart(true);
+
+                list.SpliceWithIn(0, 0, values.ToArray());
+
+                Actions.AllowStateChangesEnd(previous);
+            }
+
+            return list;
+        }
+
         public TOut this[int key]
         {
             get
@@ -286,7 +302,7 @@ namespace Skclusive.Mobx.Observable
             return SpliceWithIn(argIndex, argDeleteCount, newItems.Select(newItem => Manipulator.Enhance(newItem)).ToArray());
         }
 
-        private TOut[] SpliceWithIn(int? argIndex, int? argDeleteCount, params TIn[] newItems)
+        protected TOut[] SpliceWithIn(int? argIndex, int? argDeleteCount, params TIn[] newItems)
         {
             KeysAtom.CheckIfStateModificationsAreAllowed();
 
@@ -312,7 +328,7 @@ namespace Skclusive.Mobx.Observable
                 var change = this.NotifyInterceptors<IListWillChange<TIn>>(ListWillChange<TIn>.Splice(this, index, newItems, deleteCount));
                 if (change == null)
                 {
-                    return new TOut[] { };
+                    return Array.Empty<TOut>();
                 }
                 deleteCount = change.RemovedCount;
                 newItems = change.Added;
