@@ -2,7 +2,7 @@
 
 namespace Skclusive.Mobx.Observable
 {
-    public interface IObservableList<TIn, TOut> : IList<TOut>, IInterceptable<IListWillChange<TIn>>, IListenable<IListDidChange<TIn>>
+    public interface IObservableList<TIn, TOut> : IList<TOut>, IObservableMeta, IInterceptable<IListWillChange<TIn>>, IListenable<IListDidChange<TIn>>
     {
         new TOut[] Clear();
 

@@ -1,6 +1,6 @@
 ﻿namespace Skclusive.Mobx.Observable
 {
-    public interface IObservableValue : IValueReader, IValueWriter
+    public interface IObservableValue : IValueReader, IValueWriter, IObservableMeta
     {
         string Name { get; }
 

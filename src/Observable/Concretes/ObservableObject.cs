@@ -29,9 +29,11 @@ namespace Skclusive.Mobx.Observable
 
         public IList<Action<IObjectDidChange>> Listeners { private set; get; } = new List<Action<IObjectDidChange>>();
 
+        public object Meta { get; }
+
         private ObservableObject(object target, IDictionary<string, IObservable> values,
             Func<IObservableObject<T, W>, T> proxify, string name = null,
-            IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+            IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
         {
             if (!typeof(T).IsInterface)
             {
@@ -42,6 +44,8 @@ namespace Skclusive.Mobx.Observable
             {
                 throw new ArgumentException($"{nameof(proxify)} should not be Null");
             }
+
+            Meta = meta;
 
             Target = target;
 
@@ -58,9 +62,11 @@ namespace Skclusive.Mobx.Observable
 
         public ObservableObject(ObservableTypeDef typeDef, IDictionary<string, IObservable> values,
             Func<IObservableObject<T, W>, T> proxify, string name,
-            IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+            IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
             : this((object)null, values, proxify, name, manipulator, otherTypes)
         {
+            Meta = meta;
+
             var addObservable = ExpressionUtils.GetMethod<ObservableObject<T, W>>(x => x.AddObservableProperty<object>("", null, null));
 
             var isObject = typeof(W) == typeof(object);
@@ -134,14 +140,14 @@ namespace Skclusive.Mobx.Observable
         //    return From(target, proxify, name, otherTypes).Proxy;
         //}
 
-        public static IObservableObject<T, W> From(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+        public static IObservableObject<T, W> From(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
         {
-            return new ObservableObject<T, W>(typeDef, null, proxify, name, manipulator, otherTypes);
+            return new ObservableObject<T, W>(typeDef, null, proxify, name, manipulator, meta, otherTypes);
         }
 
-        public static T FromAs(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+        public static T FromAs(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
         {
-            return From(typeDef, proxify, name, manipulator, otherTypes).Proxy;
+            return From(typeDef, proxify, name, manipulator, meta, otherTypes).Proxy;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)

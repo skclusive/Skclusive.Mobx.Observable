@@ -2,7 +2,7 @@
 
 namespace Skclusive.Mobx.Observable
 {
-    public interface IObservableObject : IInterceptable<IObjectWillChange>, IListenable<IObjectDidChange>
+    public interface IObservableObject : IObservableMeta, IInterceptable<IObjectWillChange>, IListenable<IObjectDidChange>
     {
         string Name { get; }
 

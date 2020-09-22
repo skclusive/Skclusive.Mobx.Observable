@@ -25,7 +25,9 @@ namespace Skclusive.Mobx.Observable
 
         public IList<Action<IListDidChange<TIn>>> Listeners { private set; get; } = new List<Action<IListDidChange<TIn>>>();
 
-        protected ObservableList(string name, IManipulator<TIn, TOut> manipulator = null)
+        public object Meta { get; }
+
+        protected ObservableList(string name, IManipulator<TIn, TOut> manipulator = null, object meta = null)
         {
             Values = new List<TIn>();
 
@@ -34,11 +36,13 @@ namespace Skclusive.Mobx.Observable
             Manipulator = manipulator ?? Manipulator<TIn, TOut>.For();
 
             KeysAtom = new Atom(Name);
+
+            Meta = meta;
         }
 
-        public static IObservableList<TIn, TOut> From(IEnumerable<TOut> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null)
+        public static IObservableList<TIn, TOut> From(IEnumerable<TOut> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null, object meta = null)
         {
-            var list = new ObservableList<TIn, TOut>(name, manipulator);
+            var list = new ObservableList<TIn, TOut>(name, manipulator, meta);
 
             if (values != null)
             {
@@ -52,9 +56,9 @@ namespace Skclusive.Mobx.Observable
             return list;
         }
 
-        public static IObservableList<TIn, TOut> FromIn(IEnumerable<TIn> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null)
+        public static IObservableList<TIn, TOut> FromIn(IEnumerable<TIn> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null, object meta = null)
         {
-            var list = new ObservableList<TIn, TOut>(name, manipulator);
+            var list = new ObservableList<TIn, TOut>(name, manipulator, meta);
 
             if (values != null)
             {

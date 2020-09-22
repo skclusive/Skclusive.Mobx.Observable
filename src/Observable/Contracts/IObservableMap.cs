@@ -2,7 +2,7 @@
 
 namespace Skclusive.Mobx.Observable
 {
-    public interface IObservableMap<TKey, TIn, TOut> : IMap<TKey, TOut>, IInterceptable<IMapWillChange<TKey, TIn>>, IListenable<IMapDidChange<TKey, TIn>>
+    public interface IObservableMap<TKey, TIn, TOut> : IMap<TKey, TOut>, IObservableMeta, IInterceptable<IMapWillChange<TKey, TIn>>, IListenable<IMapDidChange<TKey, TIn>>
     {
         string Name { get; }
 

@@ -25,7 +25,9 @@ namespace Skclusive.Mobx.Observable
 
         public IList<Action<IMapDidChange<TKey, TIn>>> Listeners { private set; get; } = new List<Action<IMapDidChange<TKey, TIn>>>();
 
-        protected ObservableMap(string name, IManipulator<TIn, TOut, TKey> manipulator = null)
+        public object Meta { get; }
+
+        protected ObservableMap(string name, IManipulator<TIn, TOut, TKey> manipulator = null, object meta = null)
         {
             Data = new Map<TKey, IObservableValue<TIn>>();
 
@@ -36,16 +38,18 @@ namespace Skclusive.Mobx.Observable
             Manipulator = manipulator ?? Manipulator<TIn, TOut, TKey>.For();
 
             KeysAtom = new Atom($"{Name}.keys()");
+
+            Meta = meta;
         }
 
-        public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null)
+        public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null, object meta = null)
         {
-            return From(values, name, null);
+            return From(values, name, null, meta);
         }
 
-        public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null)
+        public static IObservableMap<TKey, TIn, TOut> From(IMap<TKey, TOut> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null, object meta = null)
         {
-            var observableMap = new ObservableMap<TKey, TIn, TOut>(name, manipulator);
+            var observableMap = new ObservableMap<TKey, TIn, TOut>(name, manipulator, meta);
 
             if (values != null)
             {
@@ -55,9 +59,9 @@ namespace Skclusive.Mobx.Observable
             return observableMap;
         }
 
-        public static IObservableMap<TKey, TIn, TOut> FromIn(IMap<TKey, TIn> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null)
+        public static IObservableMap<TKey, TIn, TOut> FromIn(IMap<TKey, TIn> values = null, string name = null, IManipulator<TIn, TOut, TKey> manipulator = null, object meta = null)
         {
-            var observableMap = new ObservableMap<TKey, TIn, TOut>(name, manipulator);
+            var observableMap = new ObservableMap<TKey, TIn, TOut>(name, manipulator, meta);
 
             if (values != null)
             {
@@ -483,13 +487,13 @@ namespace Skclusive.Mobx.Observable
 
     public class ObservableMap<TKey, TIn> : ObservableMap<TKey, TIn, TIn>, IObservableMap<TKey, TIn>
     {
-        protected ObservableMap(string name, IManipulator<TIn, TIn, TKey> manipulator = null) : base(name, manipulator)
+        protected ObservableMap(string name, IManipulator<TIn, TIn, TKey> manipulator = null, object meta = null) : base(name, manipulator, meta)
         {
         }
 
-        public static new IObservableMap<TKey, TIn> From(IMap<TKey, TIn> values = null, string name = null)
+        public static new IObservableMap<TKey, TIn> From(IMap<TKey, TIn> values = null, string name = null, object meta = null)
         {
-            var observableMap = new ObservableMap<TKey, TIn>(name, null);
+            var observableMap = new ObservableMap<TKey, TIn>(name, null, meta);
 
             if (values != null)
             {

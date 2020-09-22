@@ -14,6 +14,8 @@ namespace Skclusive.Mobx.Observable
 
         public string Name => Target.Name;
 
+        public object Meta => Target.Meta;
+
         public IList<Func<IObjectWillChange, IObjectWillChange>> Interceptors => Target.Interceptors;
 
         public IList<Action<IObjectDidChange>> Listeners => Target.Listeners;
