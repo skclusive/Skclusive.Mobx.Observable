@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Skclusive.Mobx.Observable
 {
@@ -27,6 +28,8 @@ namespace Skclusive.Mobx.Observable
         IEnumerable<TIn> GetValues();
 
         TIn Get(int index);
+
+        int FindIndex(Predicate<TOut> match);
     }
 
     public interface IObservableList<T> : IObservableList<T, T>

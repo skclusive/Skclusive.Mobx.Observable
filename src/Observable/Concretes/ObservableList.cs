@@ -136,6 +136,13 @@ namespace Skclusive.Mobx.Observable
             Splice(index, 0, value);
         }
 
+        public int FindIndex(Predicate<TOut> match)
+        {
+            KeysAtom.ReportObserved();
+
+            return Dehance(Values).ToList().FindIndex(match);
+        }
+
         public void Unshift(TOut value)
         {
             Insert(0, value);
