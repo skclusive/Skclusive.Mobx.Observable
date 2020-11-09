@@ -34,7 +34,7 @@ namespace Skclusive.Mobx.Observable
         {
             set
             {
-                if (!(value is T))
+                if (value != null && !(value is T))
                 throw new Exception($"Value is not of {typeof(T).Name}");
 
                 _Value = value;

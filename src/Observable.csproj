@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>5.0.0-rc3</VersionPrefix>
+    <VersionPrefix>5.0.0-rc4</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>Skclusive.Mobx.Observable</AssemblyName>
@@ -11,10 +11,10 @@
   </PropertyGroup>
 
    <ItemGroup>
-    <PackageReference Include="Skclusive.Core.Collection" Version="5.0.0-rc1" />
+    <PackageReference Include="Skclusive.Core.Collection" Version="5.0.0-rc4" />
   </ItemGroup>
   <!-- <ItemGroup>
-    <ProjectReference Include="..\..\Skclusive.Core.Collection\src\Collection.csproj" Version="5.0.0-rc1" />
+    <ProjectReference Include="..\..\Skclusive.Core.Collection\src\Collection.csproj" Version="5.0.0-rc4" />
   </ItemGroup> -->
 
 </Project>
