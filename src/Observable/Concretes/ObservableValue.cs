@@ -5,8 +5,10 @@ namespace Skclusive.Mobx.Observable
 {
     public class ObservableValue<TIn, TOut> : Atom, IObservableValue<TIn, TOut>
     {
-        public ObservableValue(TIn value, string name = null, IManipulator manipulator = null) : base(name ?? $"ObservableValue@{States.NextId}")
+        public ObservableValue(TIn value, string name = null, IManipulator manipulator = null, object meta = null) : base(name ?? $"ObservableValue@{States.NextId}")
         {
+            Meta = meta;
+
             Manipulator = manipulator ?? Manipulator<TIn, TOut>.For();
 
             _Value = Manipulator.Enhance(value, default(TIn), Name);
@@ -22,12 +24,14 @@ namespace Skclusive.Mobx.Observable
             return From(value, null);
         }
 
-        public static IObservableValue<TIn, TOut> From(TIn value, string name)
+        public static IObservableValue<TIn, TOut> From(TIn value, string name, IManipulator<TIn, TOut> manipulator = null, object meta = null)
         {
-            return new ObservableValue<TIn, TOut>(value, name);
+            return new ObservableValue<TIn, TOut>(value, name, manipulator, meta);
         }
 
         private IManipulator Manipulator { set; get; }
+
+        public object Meta { get; }
 
         public IList<Func<IValueWillChange<TIn>, IValueWillChange<TIn>>> Interceptors { private set; get; } = new List<Func<IValueWillChange<TIn>, IValueWillChange<TIn>>>();
 
@@ -175,7 +179,7 @@ namespace Skclusive.Mobx.Observable
 
     public class ObservableValue<T> : ObservableValue<T, T>, IObservableValue<T>
     {
-        public ObservableValue(T value, string name = null, IManipulator<T, T> manipulator = null) : base(value, name, manipulator)
+        public ObservableValue(T value, string name = null, IManipulator<T, T> manipulator = null, object meta = null) : base(value, name, manipulator, meta)
         {
         }
 
@@ -189,9 +193,9 @@ namespace Skclusive.Mobx.Observable
             return From(value, null);
         }
 
-        public new static IObservableValue<T> From(T value, string name)
+        public new static IObservableValue<T> From(T value, string name, IManipulator<T, T> manipulator = null, object meta = null)
         {
-            return new ObservableValue<T>(value, name);
+            return new ObservableValue<T>(value, name, manipulator, meta);
         }
     }
 }

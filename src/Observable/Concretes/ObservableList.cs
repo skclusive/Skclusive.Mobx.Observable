@@ -25,7 +25,9 @@ namespace Skclusive.Mobx.Observable
 
         public IList<Action<IListDidChange<TIn>>> Listeners { private set; get; } = new List<Action<IListDidChange<TIn>>>();
 
-        protected ObservableList(string name, IManipulator<TIn, TOut> manipulator = null)
+        public object Meta { get; }
+
+        protected ObservableList(string name, IManipulator<TIn, TOut> manipulator = null, object meta = null)
         {
             Values = new List<TIn>();
 
@@ -34,17 +36,35 @@ namespace Skclusive.Mobx.Observable
             Manipulator = manipulator ?? Manipulator<TIn, TOut>.For();
 
             KeysAtom = new Atom(Name);
+
+            Meta = meta;
         }
 
-        public static IObservableList<TIn, TOut> From(IEnumerable<TOut> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null)
+        public static IObservableList<TIn, TOut> From(IEnumerable<TOut> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null, object meta = null)
         {
-            var list = new ObservableList<TIn, TOut>(name, manipulator);
+            var list = new ObservableList<TIn, TOut>(name, manipulator, meta);
 
             if (values != null)
             {
                 var previous = Actions.AllowStateChangesStart(true);
 
                 list.SpliceWith(0, 0, values.ToArray());
+
+                Actions.AllowStateChangesEnd(previous);
+            }
+
+            return list;
+        }
+
+        public static IObservableList<TIn, TOut> FromIn(IEnumerable<TIn> values = null, string name = null, IManipulator<TIn, TOut> manipulator = null, object meta = null)
+        {
+            var list = new ObservableList<TIn, TOut>(name, manipulator, meta);
+
+            if (values != null)
+            {
+                var previous = Actions.AllowStateChangesStart(true);
+
+                list.SpliceWithIn(0, 0, values.ToArray());
 
                 Actions.AllowStateChangesEnd(previous);
             }
@@ -114,6 +134,13 @@ namespace Skclusive.Mobx.Observable
         public void Insert(int index, TOut value)
         {
             Splice(index, 0, value);
+        }
+
+        public int FindIndex(Predicate<TOut> match)
+        {
+            KeysAtom.ReportObserved();
+
+            return Dehance(Values).ToList().FindIndex(match);
         }
 
         public void Unshift(TOut value)
@@ -286,7 +313,7 @@ namespace Skclusive.Mobx.Observable
             return SpliceWithIn(argIndex, argDeleteCount, newItems.Select(newItem => Manipulator.Enhance(newItem)).ToArray());
         }
 
-        private TOut[] SpliceWithIn(int? argIndex, int? argDeleteCount, params TIn[] newItems)
+        protected TOut[] SpliceWithIn(int? argIndex, int? argDeleteCount, params TIn[] newItems)
         {
             KeysAtom.CheckIfStateModificationsAreAllowed();
 
@@ -312,7 +339,7 @@ namespace Skclusive.Mobx.Observable
                 var change = this.NotifyInterceptors<IListWillChange<TIn>>(ListWillChange<TIn>.Splice(this, index, newItems, deleteCount));
                 if (change == null)
                 {
-                    return new TOut[] { };
+                    return Array.Empty<TOut>();
                 }
                 deleteCount = change.RemovedCount;
                 newItems = change.Added;

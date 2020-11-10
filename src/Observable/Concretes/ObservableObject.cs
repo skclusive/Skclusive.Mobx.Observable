@@ -17,7 +17,7 @@ namespace Skclusive.Mobx.Observable
 
         private IDictionary<string, IObservableValue<bool>> PendingKeys { set; get; }
 
-        private IDictionary<string, IObservable> Values { set; get; }
+        private IDictionary<string, object> Values { set; get; }
 
         public string Name { private set; get; }
 
@@ -29,9 +29,12 @@ namespace Skclusive.Mobx.Observable
 
         public IList<Action<IObjectDidChange>> Listeners { private set; get; } = new List<Action<IObjectDidChange>>();
 
-        private ObservableObject(object target, IDictionary<string, IObservable> values,
+        public object Meta { get; }
+
+        private ObservableObject(object target,
+            IDictionary<string, object> values,
             Func<IObservableObject<T, W>, T> proxify, string name = null,
-            IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+            IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
         {
             if (!typeof(T).IsInterface)
             {
@@ -43,9 +46,11 @@ namespace Skclusive.Mobx.Observable
                 throw new ArgumentException($"{nameof(proxify)} should not be Null");
             }
 
+            Meta = meta;
+
             Target = target;
 
-            Values = values ?? new Dictionary<string, IObservable>();
+            Values = values ?? new Dictionary<string, object>();
 
             Name = name ?? $"ObservableObject@{States.NextId}";
 
@@ -56,12 +61,15 @@ namespace Skclusive.Mobx.Observable
             Proxy = proxify(this);
         }
 
-        public ObservableObject(ObservableTypeDef typeDef, IDictionary<string, IObservable> values,
+        public ObservableObject(ObservableTypeDef typeDef,
+            IDictionary<string, object> values,
             Func<IObservableObject<T, W>, T> proxify, string name,
-            IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+            IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
             : this((object)null, values, proxify, name, manipulator, otherTypes)
         {
-            var addObservable = ExpressionUtils.GetMethod<ObservableObject<T, W>>(x => x.AddObservableProperty<object>("", null, null));
+            Meta = meta;
+
+            var addObservable = ExpressionUtils.GetMethod<ObservableObject<T, W>>(x => x.AddObservableProperty<object>("", default, default));
 
             var isObject = typeof(W) == typeof(object);
 
@@ -86,6 +94,15 @@ namespace Skclusive.Mobx.Observable
             foreach (var action in typeDef.Actions)
             {
                 AddActionMethod(action.Name, action.Action);
+            }
+
+            var addVolatile = ExpressionUtils.GetMethod<ObservableObject<T, W>>(x => x.AddVolatileProperty<object>(default, default));
+
+            foreach (var xvolatile in typeDef.Volatiles)
+            {
+                var add = addVolatile.MakeGenericMethod(xvolatile.Type);
+
+                add.Invoke(this, new object[] { xvolatile.Name, xvolatile.Default });
             }
         }
 
@@ -134,14 +151,14 @@ namespace Skclusive.Mobx.Observable
         //    return From(target, proxify, name, otherTypes).Proxy;
         //}
 
-        public static IObservableObject<T, W> From(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+        public static IObservableObject<T, W> From(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
         {
-            return new ObservableObject<T, W>(typeDef, null, proxify, name, manipulator, otherTypes);
+            return new ObservableObject<T, W>(typeDef, null, proxify, name, manipulator, meta, otherTypes);
         }
 
-        public static T FromAs(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, params Type[] otherTypes)
+        public static T FromAs(ObservableTypeDef typeDef, Func<IObservableObject<T, W>, T> proxify, string name, IManipulator<W, object> manipulator = null, object meta = null, params Type[] otherTypes)
         {
-            return From(typeDef, proxify, name, manipulator, otherTypes).Proxy;
+            return From(typeDef, proxify, name, manipulator, meta, otherTypes).Proxy;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
@@ -190,9 +207,9 @@ namespace Skclusive.Mobx.Observable
 
         public bool TryInvokeAction(string name, object[] args, out object result)
         {
-            if (Values.TryGetValue(name, out IObservable observable))
+            if (Values.TryGetValue(name, out object vaule))
             {
-                if (observable is IObservableAction action)
+                if (vaule is IObservableAction action)
                 {
                     result = action.Execute(args);
 
@@ -232,16 +249,21 @@ namespace Skclusive.Mobx.Observable
                 return null;
             }
 
-            var observable = Values[key];
+            var value = Values[key];
 
-            if (observable is IComputedValue computed)
+            if (value is IComputedValue computed)
             {
                 return computed.Value;
             }
 
-            if (observable is IObservableValue value)
+            if (value is IObservableValue observable)
             {
-                return value.Value;
+                return observable.Value;
+            }
+
+            if (value is IValueReader reader)
+            {
+               return reader.Value;
             }
 
             return null;
@@ -256,11 +278,18 @@ namespace Skclusive.Mobx.Observable
                 return false;
             }
 
-            var observable = Values[key];
+            var _value = Values[key];
 
-            if (observable is IComputedValue computed)
+            if (_value is IComputedValue computed)
             {
                 throw new InvalidOperationException($"Property {key} is computed value {computed.ToString()} and can not be updated");
+            }
+
+            if (_value is IVolatileValue writer)
+            {
+                (writer as IValueWriter).Value = newValue;
+
+                return true;
             }
 
             if (this.HasInterceptors())
@@ -275,7 +304,7 @@ namespace Skclusive.Mobx.Observable
                 value = change.NewValue;
             }
 
-            if (observable is IObservableValue obsvalue)
+            if (_value is IObservableValue obsvalue)
             {
                 var oldValue = obsvalue.Value;
                 if (obsvalue.PrepareNewValue(oldValue, value, out object changedValue))
@@ -298,7 +327,7 @@ namespace Skclusive.Mobx.Observable
 
         public bool Has(string key)
         {
-            if (Values.TryGetValue(key, out IObservable value))
+            if (Values.TryGetValue(key, out object value))
             {
                 return true;
             }
@@ -400,6 +429,13 @@ namespace Skclusive.Mobx.Observable
             var computed = new ComputedValue<P>(opts);
 
             Values[property] = computed;
+        }
+
+        public void AddVolatileProperty<V>(string property, V value)
+        {
+            var xvolatile = VolatileValue<V>.From(value);
+
+            Values[property] = xvolatile;
         }
 
         public void AddObservableProperty<P>(string property, W value, IManipulator manipulator)
@@ -508,7 +544,13 @@ namespace Skclusive.Mobx.Observable
 
     public class ObservableObject<T> : ObservableObject<T, object>, IObservableObject<T> where T : class
     {
-        public ObservableObject(ObservableTypeDef typeDef, IDictionary<string, IObservable> values, Func<IObservableObject<T>, T> proxify, string name, IManipulator manipulator = null, params Type[] otherTypes) : base(typeDef, values, (x) => proxify(x as IObservableObject<T>), name, null, otherTypes)
+        public ObservableObject(ObservableTypeDef typeDef,
+            IDictionary<string, object> values,
+            Func<IObservableObject<T>, T> proxify,
+            string name,
+            IManipulator manipulator = null,
+            params Type[] otherTypes)
+            : base(typeDef, values, (x) => proxify(x as IObservableObject<T>), name, null, otherTypes)
         {
         }
 

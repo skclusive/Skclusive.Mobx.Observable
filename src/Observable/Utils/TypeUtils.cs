@@ -23,5 +23,14 @@ namespace Skclusive.Mobx.Observable
 
             return null;
         }
+
+        public static void InvalidateComputed(object thing, string property = null, bool nothrow = false)
+        {
+            var atom = GetAtom(thing, property, nothrow);
+            if (atom is IComputedValue<object> computed)
+            {
+                computed.TrackAndCompute();
+            }
+        }
     }
 }

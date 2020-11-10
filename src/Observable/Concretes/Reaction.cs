@@ -29,7 +29,7 @@ namespace Skclusive.Mobx.Observable
 
         private Action<Reaction> OnInvalidate { set; get; }
 
-        private Action<object, IDerivation> ErrorHandler { set; get; }
+        private Action<Exception, IDerivation> ErrorHandler { set; get; }
 
         public bool IsScheduled { private set; get; }
 
@@ -39,7 +39,7 @@ namespace Skclusive.Mobx.Observable
 
         public bool IsDisposed { private set; get; }
 
-        public Reaction(string name, Action<Reaction> onInvalidate, Action<object, IDerivation> errorHandler)
+        public Reaction(string name, Action<Reaction> onInvalidate, Action<Exception, IDerivation> errorHandler)
         {
             Name = name ?? $"Reaction@{States.NextId}";
 
@@ -147,7 +147,7 @@ namespace Skclusive.Mobx.Observable
             });
         }
 
-        private void ReportExceptionInDerivation(object error)
+        private void ReportExceptionInDerivation(Exception error)
         {
             if (ErrorHandler != null)
             {

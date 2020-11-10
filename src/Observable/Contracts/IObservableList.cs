@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Skclusive.Mobx.Observable
 {
-    public interface IObservableList<TIn, TOut> : IList<TOut>, IInterceptable<IListWillChange<TIn>>, IListenable<IListDidChange<TIn>>
+    public interface IObservableList<TIn, TOut> : IList<TOut>, IObservableMeta, IInterceptable<IListWillChange<TIn>>, IListenable<IListDidChange<TIn>>
     {
         new TOut[] Clear();
 
@@ -27,6 +28,8 @@ namespace Skclusive.Mobx.Observable
         IEnumerable<TIn> GetValues();
 
         TIn Get(int index);
+
+        int FindIndex(Predicate<TOut> match);
     }
 
     public interface IObservableList<T> : IObservableList<T, T>

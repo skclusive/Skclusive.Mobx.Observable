@@ -5,6 +5,15 @@ using System.Linq.Expressions;
 
 namespace Skclusive.Mobx.Observable
 {
+    public class VolatileProperty
+    {
+        public string Name { set; get; }
+
+        public Type Type { set; get; }
+
+        public object Default { set; get; }
+    }
+
     public class ObservableProperty
     {
         public string Name { set; get; }
@@ -32,10 +41,15 @@ namespace Skclusive.Mobx.Observable
 
     public class ObservableTypeDef
     {
-        public ObservableTypeDef(IEnumerable<ObservableProperty> observables,
-            IEnumerable<ComputedProperty> computeds, IEnumerable<ActionMethod> actions = null)
+        public ObservableTypeDef(
+            IEnumerable<ObservableProperty> observables,
+            IEnumerable<VolatileProperty> volatiles,
+            IEnumerable<ComputedProperty> computeds,
+            IEnumerable<ActionMethod> actions = null)
         {
             Observables = observables;
+
+            Volatiles = volatiles;
 
             Computeds = computeds;
 
@@ -43,6 +57,8 @@ namespace Skclusive.Mobx.Observable
         }
 
         public IEnumerable<ObservableProperty> Observables { private set; get; }
+
+        public IEnumerable<VolatileProperty> Volatiles { private set; get; }
 
         public IEnumerable<ComputedProperty> Computeds { private set; get; }
 
@@ -53,6 +69,8 @@ namespace Skclusive.Mobx.Observable
     {
         private readonly ISet<ObservableProperty> ObservableProperties = new HashSet<ObservableProperty>();
 
+        private readonly ISet<VolatileProperty> VolatileProperties = new HashSet<VolatileProperty>();
+
         private readonly ISet<ComputedProperty> ComputedProperties = new HashSet<ComputedProperty>();
 
         private readonly ISet<ActionMethod> ActionMethods = new HashSet<ActionMethod>();
@@ -62,6 +80,22 @@ namespace Skclusive.Mobx.Observable
             var property = ExpressionUtils.GetPropertySymbol(expresion);
 
             ObservableProperties.Add(new ObservableProperty
+            {
+                Name = property,
+
+                Default = defaultValue,
+
+                Type = typeof(I)
+            });
+
+            return this;
+        }
+
+        public ObservableTypeDefBuilder<T> Volatile<I>(Expression<Func<T, I>> expresion, I defaultValue = default(I))
+        {
+            var property = ExpressionUtils.GetPropertySymbol(expresion);
+
+            VolatileProperties.Add(new VolatileProperty
             {
                 Name = property,
 
@@ -163,7 +197,7 @@ namespace Skclusive.Mobx.Observable
 
         public ObservableTypeDef Build()
         {
-            return new ObservableTypeDef(ObservableProperties, ComputedProperties, ActionMethods);
+            return new ObservableTypeDef(ObservableProperties, VolatileProperties, ComputedProperties, ActionMethods);
         }
     }
 }
